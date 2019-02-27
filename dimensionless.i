@@ -3,12 +3,12 @@
 
     type = GeneratedMesh
     dim = 2
-    nx = 10
-    ny = 2
+    nx = 300
+    ny = 60
     xmin = 0
-    xmax = 1
+    xmax = 100
     ymin = 0
-    ymax = 1
+    ymax = 20
 []
 
 [Variables]
@@ -16,14 +16,24 @@
     order = FIRST
     family = LAGRANGE
     [./InitialCondition]
-      type = RandomIC
+      type = SmoothCircleIC
+      x1 = 0
+      y1 = 10
+      radius = 10
+      invalue = 0.5
+      outvalue = 0
     [../]
   [../]
   [./p]
     order = FIRST
     family = LAGRANGE
     [./InitialCondition]
-      type = RandomIC
+      type = SmoothCircleIC
+      x1 = 50
+      y1 = 10
+      radius = 3
+      invalue = 0.25
+      outvalue = 0
     [../]
   [../]
   [./phi]
@@ -34,32 +44,32 @@
 
 [Kernels]
   [./Diffusion_e]
-    type = ElectronDiff
-    variable = phi
-    n = n
+    type = ElectronDiffusion
+    variable = n
   [../]
   [./Drift_e]
     type = ElectronDrift
-    variable = n
+    variable = phi
+    n = n
   [../]
-  [./Time_e]
-    type = TimeDerivative
-    variable = n
-  [../]
+  # [./Time_e]
+  #   type = TimeDerivative
+  #   variable = n
+  # [../]
 
   [./Diffusion_p]
-    type = HoleDiff
+    type = HoleDiffusion
+    variable = p
+  [../]
+  [./Drift_p]
+    type = HoleDrift
     variable = phi
     p = p
   [../]
-  [./Drift_p]
-    type = ElectronDrift
-    variable = p
-  [../]
-  [./Time_p]
-    type = TimeDerivative
-    variable = p
-  [../]
+  # [./Time_p]
+  #   type = TimeDerivative
+  #   variable = p
+  # [../]
 
   [./ElectrostaticsCombo]
     type = ElectrostaticsCombo
@@ -71,36 +81,55 @@
 []
 
 [BCs]
-  # [./bottom_convected]
+  [./bottom_convected]
+    type = DirichletBC
+    variable = phi
+    boundary = 'left'
+    value = 1
+  [../]
+  [./top_convected]
+    type = DirichletBC
+    variable = phi
+    boundary = 'right'
+    value = 0
+  [../]
+  # [./bottom_diffused]
   #   type = DirichletBC
-  #   variable = phi
+  #   variable = n
   #   boundary = 'bottom'
   #   value = 1
   # [../]
-  # [./top_convected]
+  # [./top_diffused]
   #   type = DirichletBC
-  #   variable = phi
+  #   variable = n
   #   boundary = 'top'
   #   value = 0
   # [../]
-  # [./bottom_diffused]
-  #   type = NeumannBC
-  #   variable = n
+  # [./bottom1_diffused]
+  #   type = DirichletBC
+  #   variable = p
   #   boundary = 'bottom'
   #   value = 0
   # [../]
-  # [./top_diffused]
-  #   type = NeumannBC
-  #   variable = n
+  # [./top2_diffused]
+  #   type = DirichletBC
+  #   variable = p
   #   boundary = 'top'
-  #   value = 0
+  #   value = 1
   # [../]
 []
 
+[Preconditioning]
+  [./SMP]
+    type = SMP
+    full = true
+  [../]
+[]
+
 [Executioner]
-  type = Transient
-  solve_type = 'PJFNK'
-  dt = 0.000001
+  type = Steady
+  solve_type = 'NEWTON'
+   # dt = 0.000001
 []
 
 

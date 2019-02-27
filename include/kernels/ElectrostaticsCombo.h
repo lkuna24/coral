@@ -17,14 +17,18 @@ public:
 protected:
   virtual Real computeQpResidual();
   virtual Real computeQpJacobian();
+  virtual Real computeQpOffDiagJacobian(unsigned int jvar);
 
 private:
   const Real _permittivity;
   const Real _len_scale;
-  const unsigned int _n_var;
-  const unsigned int _p_var;
   const VariableValue & _n;
   const VariableValue & _p;
+  const unsigned int _n_var;
+  const unsigned int _p_var;
+  Real q;
+  Real kb;
+  Real T;
 
 };
 #endif
